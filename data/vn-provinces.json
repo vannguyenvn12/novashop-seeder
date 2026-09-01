@@ -1,0 +1,76 @@
+[
+  {
+    "province": "Hồ Chí Minh",
+    "weight": 70,
+    "districts": [
+      { "district": "Quận 1", "wards": ["Bến Nghé", "Bến Thành", "Cầu Kho", "Cầu Ông Lãnh", "Đa Kao", "Nguyễn Cư Trinh", "Nguyễn Thái Bình", "Phạm Ngũ Lão", "Tân Định"] },
+      { "district": "Quận 3", "wards": ["Võ Thị Sáu", "Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14"] },
+      { "district": "Quận 4", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 9", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16", "Phường 18"] },
+      { "district": "Quận 5", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"] },
+      { "district": "Quận 6", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14"] },
+      { "district": "Quận 7", "wards": ["Bình Thuận", "Phú Mỹ", "Phú Thuận", "Tân Hưng", "Tân Kiểng", "Tân Phong", "Tân Phú", "Tân Thuận Đông", "Tân Thuận Tây"] },
+      { "district": "Quận 8", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16"] },
+      { "district": "Quận 10", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"] },
+      { "district": "Quận 11", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16"] },
+      { "district": "Quận 12", "wards": ["An Phú Đông", "Đông Hưng Thuận", "Hiệp Thành", "Tân Chánh Hiệp", "Tân Hưng Thuận", "Tân Thới Hiệp", "Tân Thới Nhất", "Thạnh Lộc", "Thạnh Xuân", "Trung Mỹ Tây"] },
+      { "district": "Bình Tân", "wards": ["An Lạc", "An Lạc A", "Bình Hưng Hòa", "Bình Hưng Hòa A", "Bình Hưng Hòa B", "Bình Trị Đông", "Bình Trị Đông A", "Bình Trị Đông B", "Tân Tạo", "Tân Tạo A"] },
+      { "district": "Bình Thạnh", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 5", "Phường 6", "Phường 7", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 17", "Phường 19", "Phường 21", "Phường 22", "Phường 24", "Phường 25", "Phường 26", "Phường 27", "Phường 28"] },
+      { "district": "Gò Vấp", "wards": ["Phường 1", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15", "Phường 16", "Phường 17"] },
+      { "district": "Phú Nhuận", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 13", "Phường 15", "Phường 17"] },
+      { "district": "Tân Bình", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Phường 13", "Phường 14", "Phường 15"] },
+      { "district": "Tân Phú", "wards": ["Hiệp Tân", "Hòa Thạnh", "Phú Thạnh", "Phú Thọ Hòa", "Phú Trung", "Sơn Kỳ", "Tân Quý", "Tân Sơn Nhì", "Tân Thành", "Tây Thạnh"] },
+      { "district": "Thành phố Thủ Đức", "wards": ["An Khánh", "An Lợi Đông", "An Phú", "Bình Chiểu", "Bình Thọ", "Bình Trưng Đông", "Bình Trưng Tây", "Cát Lái", "Hiệp Bình Chánh", "Hiệp Bình Phước", "Hiệp Phú", "Linh Chiểu", "Linh Đông", "Linh Tây", "Linh Trung", "Linh Xuân", "Long Bình", "Long Phước", "Long Thạnh Mỹ", "Long Trường", "Phú Hữu", "Phước Bình", "Phước Long A", "Phước Long B", "Tam Bình", "Tam Phú", "Tân Phú", "Tăng Nhơn Phú A", "Tăng Nhơn Phú B", "Thạnh Mỹ Lợi", "Thảo Điền", "Thủ Thiêm", "Trường Thạnh", "Trường Thọ"] },
+      { "district": "Bình Chánh", "wards": ["An Phú Tây", "Bình Chánh", "Bình Hưng", "Đa Phước", "Hưng Long", "Lê Minh Xuân", "Phạm Văn Hai", "Phong Phú", "Quy Đức", "Tân Đức", "Tân Kiên", "Tân Nhựt", "Tân Quý Tây", "Vĩnh Lộc A", "Vĩnh Lộc B"] },
+      { "district": "Củ Chi", "wards": ["An Nhơn Tây", "An Phú", "Bình Mỹ", "Hòa Phú", "Nhuận Đức", "Phạm Văn Cội", "Phú Hòa Đông", "Phú Mỹ Hưng", "Phước Hiệp", "Phước Thạnh", "Phước Vĩnh An", "Tân An Hội", "Tân Phú Trung", "Tân Thạnh Đông", "Tân Thạnh Tây", "Tân Thông Hội", "Thái Mỹ", "Trung An", "Trung Lập Hạ", "Trung Lập Thượng", "Thị trấn Củ Chi"] },
+      { "district": "Hóc Môn", "wards": ["Bà Điểm", "Đông Thạnh", "Nhị Bình", "Tân Hiệp", "Tân Thới Nhì", "Tân Xuân", "Thới Tam Thôn", "Trung Chánh", "Xuân Thới Đông", "Xuân Thới Sơn", "Xuân Thới Thượng"] },
+      { "district": "Nhà Bè", "wards": ["Hiệp Phước", "Long Thới", "Nhơn Đức", "Phú Xuân", "Phước Kiển", "Phước Lộc", "Thị trấn Nhà Bè"] },
+      { "district": "Cần Giờ", "wards": ["An Thới Đông", "Bình Khánh", "Cần Thạnh", "Long Hòa", "Lý Nhơn", "Tam Thôn Hiệp", "Thạnh An", "Thị trấn Cần Thạnh"] }
+    ]
+  },
+  {
+    "province": "Bình Dương",
+    "weight": 8,
+    "districts": [
+      { "district": "Thành phố Thủ Dầu Một", "wards": ["Phú Cường", "Phú Hòa", "Phú Lợi", "Hiệp An", "Hiệp Thành", "Phú Mỹ", "Phú Tân", "Tân An", "Tương Bình Hiệp", "Chánh Mỹ", "Định Hòa", "Hòa Phú"] },
+      { "district": "Thành phố Dĩ An", "wards": ["An Bình", "Bình An", "Bình Thắng", "Dĩ An", "Đông Hòa", "Tân Bình", "Tân Đông Hiệp", "Tân Hạnh"] },
+      { "district": "Thành phố Thuận An", "wards": ["An Phú", "An Thạnh", "Bình Chuẩn", "Bình Hòa", "Bình Nhâm", "Hưng Định", "Lái Thiêu", "Thuận Giao", "Vĩnh Phú"] },
+      { "district": "Thành phố Tân Uyên", "wards": ["Khánh Bình", "Phú Chánh", "Tân Hiệp", "Tân Phước Khánh", "Thạnh Phước", "Thái Hòa", "Uyên Hưng", "Vĩnh Tân"] }
+    ]
+  },
+  {
+    "province": "Đồng Nai",
+    "weight": 8,
+    "districts": [
+      { "district": "Thành phố Biên Hòa", "wards": ["An Bình", "An Hòa", "Bình Đa", "Bửu Hòa", "Bửu Long", "Hiệp Hòa", "Hóa An", "Hòa Bình", "Long Bình", "Long Bình Tân", "Phước Tân", "Quang Vinh", "Quyết Thắng", "Tam Hiệp", "Tam Phước", "Tân Biên", "Tân Hiệp", "Tân Hòa", "Tân Mai", "Tân Phong", "Tân Tiến", "Tân Vạn", "Thanh Bình", "Thống Nhất", "Trảng Dài", "Trung Dũng"] },
+      { "district": "Thành phố Long Khánh", "wards": ["Bảo Vinh", "Bàu Sen", "Phú Bình", "Suối Tre", "Xuân An", "Xuân Bình", "Xuân Hòa", "Xuân Lập", "Xuân Tân", "Xuân Thanh", "Xuân Trung"] },
+      { "district": "Huyện Nhơn Trạch", "wards": ["Hiệp Phước", "Long Tân", "Long Thọ", "Phú Đông", "Phú Hội", "Phú Thạnh", "Phước An", "Phước Khánh", "Phước Lai", "Phước Long", "Phước Thiền", "Tam An", "Tân Hiệp", "Thị trấn Hiệp Phước", "Vĩnh Thanh"] },
+      { "district": "Huyện Long Thành", "wards": ["An Phước", "Bàu Cạn", "Bình An", "Bình Sơn", "Cẩm Đường", "Long An", "Long Phước", "Long Thành", "Long Đức", "Lộc An", "Phước Bình", "Phước Thái", "Tam An", "Tân Hiệp", "Thị trấn Long Thành"] }
+    ]
+  },
+  {
+    "province": "Long An",
+    "weight": 5,
+    "districts": [
+      { "district": "Thành phố Tân An", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Khánh Hậu", "Tân Khánh", "An Vĩnh Ngãi", "Bình Tâm", "Hướng Thọ Phú", "Lợi Bình Nhơn", "Nhơn Thạnh Trung"] },
+      { "district": "Huyện Bến Lức", "wards": ["An Thạnh", "Bình Đức", "Long Hiệp", "Lương Bình", "Lương Hòa", "Mỹ An", "Mỹ Phú", "Nhựt Chánh", "Phước Lợi", "Tân Bửu", "Tân Hòa", "Thạnh Đức", "Thạnh Hòa", "Thạnh Lợi", "Thạnh Ngãi", "Thị trấn Bến Lức"] },
+      { "district": "Huyện Cần Giuộc", "wards": ["Đông Thạnh", "Long An", "Long Hậu", "Long Phụng", "Long Thượng", "Mỹ Lộc", "Phước Hậu", "Phước Lại", "Phước Lâm", "Phước Lý", "Phước Vĩnh Đông", "Phước Vĩnh Tây", "Tân Kim", "Tân Lập", "Tân Tập", "Thạnh Phú", "Thị trấn Cần Giuộc", "Thuận Thành"] }
+    ]
+  },
+  {
+    "province": "Bà Rịa - Vũng Tàu",
+    "weight": 5,
+    "districts": [
+      { "district": "Thành phố Vũng Tàu", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Phường 11", "Phường 12", "Thắng Nhất", "Thắng Nhì", "Thắng Tam", "Nguyễn An Ninh", "Rạch Dừa", "Long Sơn"] },
+      { "district": "Thành phố Bà Rịa", "wards": ["Phước Hưng", "Phước Hiệp", "Phước Trung", "Phước Nguyên", "Long Toàn", "Long Tâm", "Long Hương", "Kim Dinh", "Hòa Long", "Tân Hưng", "Long Phước", "Long Phú"] },
+      { "district": "Thị xã Phú Mỹ", "wards": ["Phú Mỹ", "Phước Hòa", "Phước Tân", "Tân Hải", "Tân Hòa", "Tân Phước", "Hắc Dịch", "Mỹ Xuân", "Sông Xoài"] }
+    ]
+  },
+  {
+    "province": "Tiền Giang",
+    "weight": 4,
+    "districts": [
+      { "district": "Thành phố Mỹ Tho", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Phường 6", "Phường 7", "Phường 8", "Phường 9", "Phường 10", "Tân Long", "Đạo Thạnh", "Trung An", "Mỹ Phong", "Tân Mỹ Chánh", "Phước Thạnh", "Thới Sơn"] },
+      { "district": "Thành phố Gò Công", "wards": ["Phường 1", "Phường 2", "Phường 3", "Phường 4", "Phường 5", "Long Hưng", "Long Chánh", "Long Hòa", "Long Thuận", "Tân Trung", "Bình Đông", "Bình Xuân", "Long Thạnh"] }
+    ]
+  }
+]

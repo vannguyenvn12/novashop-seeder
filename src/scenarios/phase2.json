@@ -1,0 +1,51 @@
+{
+  "label": "phase2",
+  "description": "Giai đoạn tăng trưởng — hàng trăm nghìn khách, nhiều tính năng (coupon, review, tồn kho đa kho)",
+  "rowCounts": {
+    "products": 200,
+    "customers": 200000,
+    "orders": 1000000,
+    "order_items": 3000000,
+    "reviews": 500000,
+    "user_events": 5000000,
+    "payments": 900000,
+    "shipments": 1100000,
+    "delivery_attempts": 1200000,
+    "order_status_history": 4400000,
+    "customer_tier_history": 520000,
+    "order_price_history": 180000,
+    "refunds": 70000,
+    "returns": 64000,
+    "cod_remittances": 400000
+  },
+  "messiness": {
+    "customers": {
+      "dupEmailPercent": 5,
+      "nullPhonePercent": 8,
+      "uppercaseEmailPercent": 2
+    },
+    "reviews": {
+      "nullCustomerPercent": 10
+    },
+    "orders": {
+      "codPercent": 50,
+      "cancelledPercent": 4,
+      "returnedPercent": 3,
+      "multiShipmentPercent": 12,
+      "priceAdjustPercent": 15
+    },
+    "shipments": {
+      "duplicateShippedEventPercent": 4
+    },
+    "payments": {
+      "gatewayMismatchPercent": 2,
+      "orphanGatewayTxnPercent": 2
+    },
+    "order_items": {
+      "multiItemOrderPercent": 35
+    },
+    "refunds": {
+      "pendingPercent": 25
+    }
+  }
+}

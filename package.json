@@ -1,0 +1,26 @@
+{
+  "name": "novashop-seeder",
+  "version": "1.0.0",
+  "description": "NovaShop checkpoint seeder — Postgres data generator for the Query Design course",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "db:schema": "node src/cli.js db:schema",
+    "db:seed": "node --max-old-space-size=4096 src/cli.js db:seed",
+    "db:reset": "node --max-old-space-size=4096 src/cli.js db:reset",
+    "db:verify": "node src/cli.js db:verify",
+    "db:restore": "node src/cli.js db:restore",
+    "doc:reference": "node scripts/generate-reference-doc.js"
+  },
+  "dependencies": {
+    "@faker-js/faker": "9.6.0",
+    "commander": "^14.0.0",
+    "dotenv": "^16.4.7",
+    "pg": "^8.13.1",
+    "pg-copy-streams": "^7.0.0",
+    "xxhash-wasm": "^1.1.0"
+  }
+}

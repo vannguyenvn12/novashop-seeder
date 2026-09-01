@@ -1,0 +1,51 @@
+{
+  "label": "phase1",
+  "description": "Giai đoạn khởi đầu — vài nghìn khách, vài chục nghìn đơn",
+  "rowCounts": {
+    "products": 200,
+    "customers": 10000,
+    "orders": 30000,
+    "order_items": 90000,
+    "reviews": 15000,
+    "user_events": 120000,
+    "payments": 27000,
+    "shipments": 31000,
+    "delivery_attempts": 35000,
+    "order_status_history": 130000,
+    "customer_tier_history": 22000,
+    "order_price_history": 6000,
+    "refunds": 2500,
+    "returns": 2200,
+    "cod_remittances": 12000
+  },
+  "messiness": {
+    "customers": {
+      "dupEmailPercent": 4,
+      "nullPhonePercent": 6,
+      "uppercaseEmailPercent": 2
+    },
+    "reviews": {
+      "nullCustomerPercent": 8
+    },
+    "orders": {
+      "codPercent": 55,
+      "cancelledPercent": 3,
+      "returnedPercent": 2,
+      "multiShipmentPercent": 8,
+      "priceAdjustPercent": 12
+    },
+    "shipments": {
+      "duplicateShippedEventPercent": 3
+    },
+    "payments": {
+      "gatewayMismatchPercent": 1,
+      "orphanGatewayTxnPercent": 1
+    },
+    "order_items": {
+      "multiItemOrderPercent": 30
+    },
+    "refunds": {
+      "pendingPercent": 30
+    }
+  }
+}

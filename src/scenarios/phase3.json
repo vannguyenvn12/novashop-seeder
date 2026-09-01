@@ -1,0 +1,51 @@
+{
+  "label": "phase3",
+  "description": "Giai đoạn quy mô lớn — hàng chục triệu khách, dashboard real-time",
+  "rowCounts": {
+    "products": 200,
+    "customers": 1000000,
+    "orders": 5000000,
+    "order_items": 15000000,
+    "reviews": 2500000,
+    "user_events": 25000000,
+    "payments": 4500000,
+    "shipments": 5400000,
+    "delivery_attempts": 6100000,
+    "order_status_history": 22000000,
+    "customer_tier_history": 2600000,
+    "order_price_history": 800000,
+    "refunds": 350000,
+    "returns": 330000,
+    "cod_remittances": 2000000
+  },
+  "messiness": {
+    "customers": {
+      "dupEmailPercent": 6,
+      "nullPhonePercent": 10,
+      "uppercaseEmailPercent": 2
+    },
+    "reviews": {
+      "nullCustomerPercent": 12
+    },
+    "orders": {
+      "codPercent": 45,
+      "cancelledPercent": 5,
+      "returnedPercent": 4,
+      "multiShipmentPercent": 15,
+      "priceAdjustPercent": 18
+    },
+    "shipments": {
+      "duplicateShippedEventPercent": 5
+    },
+    "payments": {
+      "gatewayMismatchPercent": 2,
+      "orphanGatewayTxnPercent": 2
+    },
+    "order_items": {
+      "multiItemOrderPercent": 40
+    },
+    "refunds": {
+      "pendingPercent": 20
+    }
+  }
+}

@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Env & secrets
+.env
+
+# Backup SQL khổng lồ (1-6GB) — không đưa lên git
+phase2.sql
+phase3.sql
+*.sql.bak
+
+# Logs
+*.log
+
+# Seed manifest (sinh lại khi seed)
+.seed-manifest/
+
+# OS
+Thumbs.db
+.DS_Store

@@ -18,9 +18,12 @@ const ALL_TABLES = [
 
 const STATUS_COLS = [
   ['orders', 'status'], ['orders', 'payment_method'], ['orders', 'payment_status'],
-  ['shipments', 'status'], ['delivery_attempts', 'result'], ['refunds', 'status'],
-  ['payments', 'status'], ['reviews', 'rating'], ['user_events', 'event_type'],
-  ['customers', 'current_tier'], ['customer_tier_history', 'tier'], ['order_price_history', 'adjustment_type'],
+  ['shipments', 'status'], ['shipments', 'carrier'], ['delivery_attempts', 'result'],
+  ['refunds', 'status'], ['refunds', 'refund_reason'], ['payments', 'status'],
+  ['payments', 'payment_gateway'], ['reviews', 'rating'], ['user_events', 'event_type'],
+  ['customers', 'current_tier'], ['customer_tier_history', 'tier'],
+  ['order_price_history', 'adjustment_type'], ['order_price_history', 'adjusted_by'],
+  ['coupons', 'type'], ['returns', 'return_reason'],
 ];
 
 async function q(text, params) {
@@ -29,7 +32,16 @@ async function q(text, params) {
 }
 
 function esc(s) {
+  if (s instanceof Date) return s.toISOString().slice(0, 19).replace('T', ' ');
   return String(s ?? '').replace(/[|]/g, '\\|').replace(/\n/g, ' ');
+}
+
+// Format Date object (pg trả timestamptz thành Date) hoặc string -> YYYY-MM-DD
+function fmtDate(v) {
+  if (v == null) return '';
+  const d = v instanceof Date ? v : new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  return d.toISOString().slice(0, 10);
 }
 
 async function main() {
@@ -43,27 +55,35 @@ async function main() {
   lines.push('## 1. Cách chạy');
   lines.push('');
   lines.push('```bash');
-  lines.push('# 1. Khởi động Postgres (port 5433)');
-  lines.push('docker compose up -d');
+  lines.push('# 1. Postgres (native 14+ hoặc docker) — DB phải có data đã seed,');
+  lines.push('#    DATABASE_URL trong .env trỏ đúng DB');
   lines.push('');
-  lines.push('# 2. Áp schema (idempotent)');
-  lines.push('npm run db:schema');
+  lines.push('# 2. Seed 1 phase (tự TRUNCATE + seed + ghi manifest)');
+  lines.push('npm run db:reset -- --phase=3');
   lines.push('');
-  lines.push('# 3. Seed 1 phase (10k / 1M / 10M)');
-  lines.push('npm run db:seed -- --phase=1');
+  lines.push('# 3. Verify checksum với manifest lúc seed');
+  lines.push('npm run db:verify -- --phase=3');
   lines.push('');
-  lines.push('# 4. Reset nếu lỡ UPDATE/DELETE (tái tạo y hệt)');
-  lines.push('npm run db:reset -- --phase=1');
-  lines.push('');
-  lines.push('# 5. Verify checksum với manifest lúc seed');
-  lines.push('npm run db:verify -- --phase=1');
+  lines.push('# 4. Restore từ backup (nhanh hơn seed, không cần generate)');
+  lines.push('npm run db:restore -- -y -f phase2.sql   # hoặc phase3.sql');
   lines.push('```');
   lines.push('');
   lines.push('Biến môi trường: `DATABASE_URL`, `BASE_SEED` (đổi seed = bộ data khác hẳn), `MANIFEST_DIR`.');
   lines.push('');
+  lines.push('> Tài liệu này sinh bởi `node scripts/generate-reference-doc.js` — query DB thật, phase lấy từ `REF_PHASE`.');
+  lines.push('');
 
   // 2. Schema
   lines.push('## 2. Schema đầy đủ');
+  lines.push('');
+  lines.push('> Ghi chú cột "chỉ lưu giá trị hiện tại" (lịch sử nằm ở bảng khác):');
+  lines.push('> - `orders.status` → lịch sử ở `order_status_history` (Module 12)');
+  lines.push('> - `customers.current_tier` → lịch sử ở `customer_tier_history` (Module 16 Case 1)');
+  lines.push('> - `orders.total_amount` → mọi điều chỉnh ở `order_price_history` (Module 16 Case 2), KHÔNG ghi đè trực tiếp');
+  lines.push('> - `order_items.unit_price` → snapshot giá lúc đặt, không tra ngược catalog (Module 16)');
+  lines.push('> - `orders.shipping_address` → snapshot địa chỉ lúc đặt; địa chỉ lưu của khách ở `customer_addresses`');
+  lines.push('> - `orders → shipments` là 1:N (1 đơn tách nhiều kiện, Module 13)');
+  lines.push('> - `refunds` (tài chính) và `returns` (logistics) là 2 luồng độc lập');
   lines.push('');
   lines.push('```sql');
   lines.push(SCHEMA);
@@ -82,9 +102,15 @@ async function main() {
   // ngày chính
   const d1 = await q('SELECT MIN(order_date)::date AS mn, MAX(order_date)::date AS mx FROM orders');
   const d2 = await q('SELECT MIN(created_at)::date AS mn, MAX(created_at)::date AS mx FROM customers');
+  const d3 = await q('SELECT MIN(paid_at)::date AS mn, MAX(paid_at)::date AS mx FROM payments');
+  const d4 = await q('SELECT MIN(event_time)::date AS mn, MAX(event_time)::date AS mx FROM user_events');
+  const d5 = await q('SELECT MIN(changed_at)::date AS mn, MAX(changed_at)::date AS mx FROM order_status_history');
   lines.push('');
-  lines.push(`- Khoảng ngày đơn hàng: **${d1[0].mn} → ${d1[0].mx}**`);
-  lines.push(`- Khoảng ngày tạo khách: **${d2[0].mn} → ${d2[0].mx}**`);
+  lines.push(`- Khoảng ngày đơn hàng: **${fmtDate(d1[0].mn)} → ${fmtDate(d1[0].mx)}**`);
+  lines.push(`- Khoảng ngày tạo khách: **${fmtDate(d2[0].mn)} → ${fmtDate(d2[0].mx)}**`);
+  lines.push(`- Khoảng ngày thanh toán: **${fmtDate(d3[0].mn)} → ${fmtDate(d3[0].mx)}**`);
+  lines.push(`- Khoảng ngày user_events: **${fmtDate(d4[0].mn)} → ${fmtDate(d4[0].mx)}**`);
+  lines.push(`- Khoảng ngày status_history: **${fmtDate(d5[0].mn)} → ${fmtDate(d5[0].mx)}**`);
   lines.push('- Tỷ lệ trung bình:');
   const itemsPerOrder = await q('SELECT ROUND(AVG(n),2) AS v FROM (SELECT COUNT(*) AS n FROM order_items GROUP BY order_id) s');
   const ordersPerCust = await q('SELECT ROUND(AVG(n),2) AS v FROM (SELECT COUNT(*) AS n FROM orders GROUP BY customer_id) s');
@@ -141,7 +167,13 @@ async function main() {
     lines.push(sql);
     lines.push('```');
     lines.push('');
-    const cols = (await q(sql + ' LIMIT 0')).fields.map((f) => f.name);
+    // Lấy tên cột: parse bảng từ SQL sample (tránh nối 'LIMIT 0' vì sample đã có LIMIT)
+    const tblMatch = sql.match(/FROM\s+(\w+)/i);
+    let cols = [];
+    if (tblMatch) {
+      const res = await pool.query(`SELECT * FROM ${tblMatch[1]} LIMIT 0`);
+      cols = res.fields.map((f) => f.name);
+    }
     lines.push('| ' + cols.map(esc).join(' | ') + ' |');
     lines.push('|' + cols.map(() => '---').join('|') + '|');
     const rows = await q(sql);
@@ -163,8 +195,8 @@ async function main() {
   mess.push(['customers', 'NULL phone', Number(nullPhone[0].n), (100 * Number(nullPhone[0].n)) / (await q('SELECT COUNT(*)::bigint AS n FROM customers'))[0].n, 'Module 1 — Dedup']);
   const nullReview = await q('SELECT COUNT(*)::bigint AS n FROM reviews WHERE customer_id IS NULL');
   mess.push(['reviews', 'customer_id NULL', Number(nullReview[0].n), (100 * Number(nullReview[0].n)) / (await q('SELECT COUNT(*)::bigint AS n FROM reviews'))[0].n, 'Module 6 — NOT IN trap']);
-  const multiShip = await q(`SELECT COUNT(*)::bigint AS n FROM (SELECT order_id FROM shipments GROUP BY order_id HAVING COUNT(*)>1) s`);
-  mess.push(['orders/shipments', '1 đơn nhiều shipment', Number(multiShip[0].n), (100 * Number(multiShip[0].n)) / (await q('SELECT COUNT(*)::bigint AS n FROM orders'))[0].n, 'Module 13 — JOIN fan-out']);
+  const multiShipCount = await q(`SELECT COUNT(*)::bigint AS n FROM (SELECT order_id FROM shipments GROUP BY order_id HAVING COUNT(*)>1) s`);
+  mess.push(['orders/shipments', '1 đơn nhiều shipment', Number(multiShipCount[0].n), (100 * Number(multiShipCount[0].n)) / (await q('SELECT COUNT(*)::bigint AS n FROM orders'))[0].n, 'Module 13 — JOIN fan-out']);
   const dupShipped = await q(`SELECT COUNT(*)::bigint AS n FROM order_status_history WHERE status='shipped' AND note='webhook retry'`);
   mess.push(['order_status_history', 'Shipped bị retry (duplicate)', Number(dupShipped[0].n), (100 * Number(dupShipped[0].n)) / (await q('SELECT COUNT(*)::bigint AS n FROM order_status_history'))[0].n, 'Module 12 — SLA']);
   const refused = await q(`SELECT COUNT(*)::bigint AS n FROM delivery_attempts WHERE result='refused'`);

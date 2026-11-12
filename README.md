@@ -21,7 +21,7 @@ MANIFEST_DIR=.seed-manifest
 npm run db:schema                 # áp schema.sql (idempotent)
 
 # Seed 1 phase (tự TRUNCATE + seed + ghi manifest)
-npm run db:reset -- --phase=1     # nhỏ, ~15s
+npm run db:reset -- --phase=1     # nhỏ, ~15s (cuối seed tự VACUUM ANALYZE để EXPLAIN ra số ổn định)
 npm run db:reset -- --phase=2     # 18M rows, ~20 phút
 npm run db:reset -- --phase=3     # 93M rows, ~80 phút
 

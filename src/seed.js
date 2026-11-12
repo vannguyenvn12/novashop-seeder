@@ -173,6 +173,11 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
     console.log('[seed] indexes recreated');
   }
 
+  // Dọn dòng chết + cập nhật thống kê planner ngay, không chờ autovacuum.
+  // Nhờ vậy EXPLAIN trên máy học viên ra cùng số trang, cùng cost, cùng số dòng đoán như bài đọc PRIMER.
+  console.log('[seed] VACUUM ANALYZE...');
+  await pool.query('VACUUM ANALYZE');
+
   // ---- manifest ----
   const manifest = await buildManifest(phase);
   await writeManifest(phase, manifest);

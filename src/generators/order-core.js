@@ -132,9 +132,13 @@ function computeOrderMeta(baseSeed, idx, cfg, products, coupons, leafIds) {
   }
 
   const codP = (cfg.messiness?.orders?.codPercent ?? 55) / 100;
-  const isCod = isReturned ? true : seededBoolSync(baseSeed, 'od_cod', idx, codP);
+  // Phase B: đơn trả hàng chia COD / trả trước như mọi đơn (bản cũ ép mọi đơn trả hàng là COD).
+  const isCod = isReturned && !cfg.phaseBRealism ? true : seededBoolSync(baseSeed, 'od_cod', idx, codP);
   const paymentMethod = isCod ? 'COD' : ['card', 'bank_transfer', 'ewallet'][hashIntSync(`${baseSeed}:od_pm:${idx}`) % 3];
-  const paymentStatus = isCancelled ? 'refunded' : paymentMethod !== 'COD' ? 'paid' : isDelivered ? 'paid' : 'unpaid';
+  // Phase B: đơn trả hàng đã thu tiền rồi hoàn một phần → 'partially_refunded' (bản cũ để COD trả hàng là 'unpaid').
+  const paymentStatus = isCancelled ? 'refunded'
+    : isReturned && cfg.phaseBRealism ? 'partially_refunded'
+    : paymentMethod !== 'COD' ? 'paid' : isDelivered ? 'paid' : 'unpaid';
 
   const subtotal = subtotalFor(baseSeed, idx, cfg, products, leafIds);
   const shippingFee = 15000 + (hashIntSync(`${baseSeed}:od_ship:${idx}`) % 45000); // 15k..60k

@@ -123,12 +123,13 @@ export function shipmentPlan(baseSeed, idx, cfg, m) {
     // delivered / returned: kiện cuối tới đúng lúc đơn 'delivered', kiện khác tới sớm hơn
     kien.status = m.status === 'returned' && k === returnedKien ? 'returned' : 'delivered';
     const early = k === n - 1 ? 0 : (h('early') % 30) * HOUR_MS;
-    kien.deliveredAt = Math.max(tDelivered - early, kien.shippedAt + 6 * HOUR_MS);
+    // không cho kiện giao sau "hôm nay" của data (kiện xuất kho muộn + 6h có thể vượt DATA_NOW)
+    kien.deliveredAt = Math.min(Math.max(tDelivered - early, kien.shippedAt + 6 * HOUR_MS), DATA_NOW_MS - 60000);
     const nAtt = h('natt') % 100 < 92 ? 1 : 2 + (h('natt2') % 2);
     for (let a = 0; a < nAtt; a++) {
       const back = (nAtt - 1 - a) * DAY_MS;
       kien.attempts.push({
-        t: Math.max(kien.deliveredAt - back, kien.shippedAt + (a + 1) * HOUR_MS),
+        t: Math.min(Math.max(kien.deliveredAt - back, kien.shippedAt + (a + 1) * HOUR_MS), kien.deliveredAt),
         result: a === nAtt - 1 ? 'success' : ['no_answer', 'wrong_address'][h(`res${a}`) % 2],
       });
     }

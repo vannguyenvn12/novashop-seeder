@@ -1,5 +1,7 @@
 {
   "label": "phase2",
+  "customerLifecycle": true,
+  "phaseBRealism": true,
   "description": "Giai đoạn tăng trưởng — hàng trăm nghìn khách, nhiều tính năng (coupon, review, tồn kho đa kho)",
   "rowCounts": {
     "products": 200,

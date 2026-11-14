@@ -14,6 +14,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { initHash, hashIntSync, seededBoolSync, seededIntSync } from '../seededFaker.js';
+import { customerIdFor } from './customer-lifecycle.js';
+import { DATA_NOW_MS, inFlightStatus, returnPlan } from './realism.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -102,20 +104,32 @@ export function orderMeta(baseSeed, idx, cfg, products, coupons, leafIds) {
 
 function computeOrderMeta(baseSeed, idx, cfg, products, coupons, leafIds) {
   const orderId = idx + 1;
-  const customerId = 1 + (idx % 10000); // ~10k khách, 30k đơn → khách lặp lại
-
   const dayOffset = hashIntSync(`${baseSeed}:od_day:${idx}`) % 730;
+  const customerId = customerIdFor(baseSeed, idx, dayOffset); // xem customer-lifecycle.js
   const hour = 8 + (hashIntSync(`${baseSeed}:od_hour:${idx}`) % 15);
   const orderDateMs = ORDER_DATE_START + dayOffset * DAY_MS + hour * 3600000;
 
   const ageDays = (Date.now() - orderDateMs) / DAY_MS;
   const cancelledP = (cfg.messiness?.orders?.cancelledPercent ?? 3) / 100;
   const returnedP = (cfg.messiness?.orders?.returnedPercent ?? 2) / 100;
+  // Hủy vẫn tính theo giờ thật như cũ để tập đơn hủy không đổi giữa các bản seed.
   const isCancelled = ageDays > 2 && seededBoolSync(baseSeed, 'od_cancelled', idx, cancelledP);
-  const isReturned = !isCancelled && ageDays > 30 && seededBoolSync(baseSeed, 'od_returned', idx, returnedP);
-  const isPending = ageDays < 1 && !isCancelled;
-  const isDelivered = !isCancelled && !isReturned && !isPending && (ageDays > 5 || seededBoolSync(baseSeed, 'od_deliv', idx, 0.9));
-  const status = isCancelled ? 'cancelled' : isReturned ? 'returned' : isPending ? 'pending' : isDelivered ? 'delivered' : 'shipped';
+  let status, isReturned, isDelivered;
+  if (cfg.phaseBRealism) {
+    // Trạng thái chụp tại DATA_NOW (01/01/2026): đơn tháng 12 chưa kịp trả hàng,
+    // đơn 5 ngày cuối có thể còn đang xử lý/giao (xem realism.js).
+    const dataAge = (DATA_NOW_MS - orderDateMs) / DAY_MS;
+    // Chỉ thành 'returned' khi kho đã nhận hàng trả trước DATA_NOW (xem returnPlan).
+    isReturned = !isCancelled && seededBoolSync(baseSeed, 'od_returned', idx, returnedP)
+      && orderDateMs + returnPlan(baseSeed, idx).receivedOff <= DATA_NOW_MS;
+    status = isCancelled ? 'cancelled' : isReturned ? 'returned' : dataAge > 5 ? 'delivered' : inFlightStatus(baseSeed, idx, dataAge);
+    isDelivered = status === 'delivered';
+  } else {
+    isReturned = !isCancelled && ageDays > 30 && seededBoolSync(baseSeed, 'od_returned', idx, returnedP);
+    const isPending = ageDays < 1 && !isCancelled;
+    isDelivered = !isCancelled && !isReturned && !isPending && (ageDays > 5 || seededBoolSync(baseSeed, 'od_deliv', idx, 0.9));
+    status = isCancelled ? 'cancelled' : isReturned ? 'returned' : isPending ? 'pending' : isDelivered ? 'delivered' : 'shipped';
+  }
 
   const codP = (cfg.messiness?.orders?.codPercent ?? 55) / 100;
   const isCod = isReturned ? true : seededBoolSync(baseSeed, 'od_cod', idx, codP);
@@ -134,7 +148,9 @@ function computeOrderMeta(baseSeed, idx, cfg, products, coupons, leafIds) {
   return {
     orderId, customerId, orderDateMs, status, paymentMethod, paymentStatus,
     subtotal, shippingFee, couponId: coupon ? coupon.id : null, couponDiscount,
-    total, addressFull, isCod, isDelivered, isCancelled,
+    total, addressFull, isCod, isDelivered, isCancelled, isReturned,
+    // Ứng viên trả hàng (có thể chưa kịp trả tại DATA_NOW) — refunds dùng ở phase B.
+    isReturnCandidate: !isCancelled && seededBoolSync(baseSeed, 'od_returned', idx, returnedP),
   };
 }
 

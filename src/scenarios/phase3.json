@@ -1,5 +1,6 @@
 {
   "label": "phase3",
+  "customerLifecycle": true,
   "description": "Giai đoạn quy mô lớn — hàng chục triệu khách, dashboard real-time",
   "rowCounts": {
     "products": 200,

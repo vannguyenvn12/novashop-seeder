@@ -21,7 +21,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { initHash } from './seededFaker.js';
 import { clearMetaCache } from './generators/order-core.js';
+import { configureCustomerLifecycle } from './generators/customer-lifecycle.js';
 import { speedUpCopy } from './db.js';
+import {
+  orderStatusHistoryB, orderPriceHistoryB, shipmentsB, deliveryAttemptsB, paymentsB, codRemittancesB, refundsB, returnsB,
+} from './generators/phase-b-tables.js';
+import { userEventsB, customerAddressesB } from './generators/phase-b-behavior.js';
+import { configureAccountSharing } from './generators/account-sharing.js';
+import { TIER_HISTORY_SQL, CATEGORY_CYCLE_SQL } from './generators/customer-tier-sql.js';
 
 const ALL_TABLES = [
   'customers', 'orders', 'order_items', 'products', 'categories', 'coupons',
@@ -82,6 +89,7 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
   await copyTable('categories', 'id,name,parent_id', (async function* () {
     for (const c of tree) yield [c.id, c.name, c.parent_id ?? ''];
   })());
+  if (cfg.phaseBRealism) await pool.query(CATEGORY_CYCLE_SQL);
   console.log('[seed] categories OK');
 
   const nProducts = Math.max(200, Math.round((cfg.rowCounts.products ?? 200) * sample));
@@ -106,7 +114,12 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
 
   // ---- orders + con ----
   const nOrders = R(cfg.rowCounts.orders);
+  configureCustomerLifecycle(baseSeed, cfg, nCustomers, nOrders);
   const leafIds = tree.filter((c) => c.parent_id !== null).map((c) => c.id);
+  // Phase B (Module 11–18): bảng con sinh theo realism.js thay cho bản cũ.
+  const B = !!cfg.phaseBRealism;
+  configureAccountSharing(baseSeed, cfg, nCustomers, nOrders, products, coupons, leafIds);
+  buildItemPrefix(baseSeed, nOrders, cfg);
 
   console.log(`[seed] orders: ${nOrders}`);
   await copyTable('orders', 'id,customer_id,coupon_id,order_date,status,payment_method,payment_status,shipping_fee_charged,total_amount,coupon_discount,shipping_address,created_at,updated_at',
@@ -118,40 +131,40 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
 
   console.log(`[seed] order_status_history`);
   await copyTable('order_status_history', 'id,order_id,status,changed_at,note',
-    orderStatusHistory(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? orderStatusHistoryB : orderStatusHistory)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] shipments`);
   await copyTable('shipments', 'id,order_id,warehouse_id,carrier,tracking_number,shipping_cost_actual,status,shipped_at,delivered_at,estimated_delivery',
-    shipments(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? shipmentsB : shipments)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] delivery_attempts`);
   await copyTable('delivery_attempts', 'id,shipment_id,attempt_number,attempted_at,result',
-    deliveryAttempts(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? deliveryAttemptsB : deliveryAttempts)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] payments`);
   await copyTable('payments', 'id,order_id,payment_gateway,gateway_txn_id,amount,status,paid_at',
-    payments(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? paymentsB : payments)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] cod_remittances`);
   await copyTable('cod_remittances', 'remittance_id,shipment_id,amount_collected,remitted_at,shipper_batch_id',
-    codRemittances(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? codRemittancesB : codRemittances)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] customer_tier_history`);
-  await copyTable('customer_tier_history', 'id,customer_id,tier,effective_from',
+  if (B) await pool.query(TIER_HISTORY_SQL); // tính từ orders, cập nhật luôn customers.current_tier
+  else await copyTable('customer_tier_history', 'id,customer_id,tier,effective_from',
     customerTierHistory(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] order_price_history`);
   await copyTable('order_price_history', 'id,order_id,adjustment_type,amount,reason,adjusted_by,adjusted_at',
-    orderPriceHistory(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? orderPriceHistoryB : orderPriceHistory)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] refunds`);
-  buildItemPrefix(baseSeed, nOrders, cfg);
   await copyTable('refunds', 'refund_id,order_item_id,refund_amount,refund_reason,status,requested_at,processed_at',
-    refunds(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? refundsB : refunds)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] returns`);
   await copyTable('returns', 'return_id,order_item_id,quantity_returned,return_reason,restocking_fee,received_at',
-    returns(baseSeed, nOrders, cfg, products, coupons, leafIds));
+    (B ? returnsB : returns)(baseSeed, nOrders, cfg, products, coupons, leafIds));
 
   console.log(`[seed] reviews`);
   await copyTable('reviews', 'id,customer_id,product_id,rating,title,content,created_at',
@@ -159,11 +172,11 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
 
   console.log(`[seed] customer_addresses`);
   await copyTable('customer_addresses', 'id,customer_id,label,full_address,province,district,ward,phone,is_default',
-    customerAddresses(baseSeed, nCustomers, cfg));
+    (B ? customerAddressesB : customerAddresses)(baseSeed, nCustomers, cfg));
 
   console.log(`[seed] user_events`);
   await copyTable('user_events', 'id,customer_id,session_id,event_type,event_time,product_id,payload',
-    userEvents(baseSeed, nOrders, cfg, products, leafIds));
+    (B ? userEventsB(baseSeed, nOrders, cfg, products, coupons, leafIds) : userEvents(baseSeed, nOrders, cfg, products, leafIds)));
 
   // Tạo lại index + constraint sau khi COPY xong (phase lớn)
   if (bigPhase) {
@@ -176,7 +189,8 @@ export async function seedPhase(phase, cfg, { sample = 1, reset = true } = {}) {
   // Dọn dòng chết + cập nhật thống kê planner ngay, không chờ autovacuum.
   // Nhờ vậy EXPLAIN trên máy học viên ra cùng số trang, cùng cost, cùng số dòng đoán như bài đọc PRIMER.
   console.log('[seed] VACUUM ANALYZE...');
-  await pool.query('VACUUM ANALYZE');
+  // PARALLEL 0: vacuum song song cần shared memory lớn hơn 64MB mặc định của Docker → lỗi "No space left on device"
+  await pool.query('VACUUM (ANALYZE, PARALLEL 0)');
 
   // ---- manifest ----
   const manifest = await buildManifest(phase);

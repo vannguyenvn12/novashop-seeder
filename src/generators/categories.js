@@ -42,6 +42,7 @@ export async function getCategoryTree(baseSeed) {
       id: ids.get(n.path.join('|')),
       name: n.name,
       parent_id: parentPath ? ids.get(parentPath) : null,
+      path: n.path.join('|'), // dùng để gán product vào đúng category lá của nó
     });
   }
   catTreeCache = rows;
